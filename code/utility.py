@@ -1,3 +1,4 @@
+from enum import Enum
 from glob import glob
 from sklearn.model_selection import GroupKFold, StratifiedKFold
 import cv2
@@ -44,6 +45,13 @@ package_paths = [
 for pth in package_paths:
   sys.path.append(pth)
 from fmix import sample_mask, make_low_freq_image, binarise_mask
+
+
+class CalibratorMode(Enum):
+  INT8 = 0
+  FP16 = 1
+  TF32 = 2
+  FP32 = 3
 
 
 def rand_bbox(size, lam):
@@ -202,6 +210,25 @@ class CassavaDataset(Dataset):
       return img
 
 
+def build_engine_common_routine(network, builder, config, runtime, engine_file_path):
+  input_batch_size = 1
+  input_channel = 1
+  input_image_width = 28
+  input_image_height = 28
+  network.get_input(0).shape = [input_batch_size, input_channel, input_image_width, input_image_height]
+  plan = builder.build_serialized_network(network, config)
+  if plan == None:
+    print("[trace] builder.build_serialized_network failed, exit -1")
+    exit(-1)
+  engine = runtime.deserialize_cuda_engine(plan)
+  print("[trace] Completed creating Engine")
+  with open(engine_file_path, "wb") as f:
+    f.write(plan)
+  return engine
+
+  pass
+
+
 from albumentations import (
   HorizontalFlip, VerticalFlip, IAAPerspective, ShiftScaleRotate, CLAHE, RandomRotate90,
   Transpose, ShiftScaleRotate, Blur, OpticalDistortion, GridDistortion, HueSaturationValue,
@@ -258,7 +285,6 @@ class CassvaImgClassifier(nn.Module):
 
 
 def prepare_dataloader(df, trn_idx, val_idx, data_root='../input/cassava-leaf-disease-classification/train_images/'):
-
   print(f'[trace] exec@prepare_dataloader')
   from catalyst.data.sampler import BalanceClassSampler
   train_ = df.loc[trn_idx, :].reset_index(drop=True)
@@ -288,7 +314,6 @@ def prepare_dataloader(df, trn_idx, val_idx, data_root='../input/cassava-leaf-di
 
 
 def train_one_epoch(epoch, model, loss_fn, optimizer, train_loader, device, scheduler=None, schd_batch_update=False):
-
   print(f'[trace] exec@train_one_epoch')
   model.train()
   t = time.time()
@@ -304,9 +329,6 @@ def train_one_epoch(epoch, model, loss_fn, optimizer, train_loader, device, sche
     with autocast():
 
       from torchsummary import summary
-      print(f'[trace] model: {model}')
-      exit(-1)
-
       image_preds = model(imgs)  # output = model(input)
       # print(image_preds.shape, exam_pred.shape)
 
@@ -338,7 +360,6 @@ def train_one_epoch(epoch, model, loss_fn, optimizer, train_loader, device, sche
 
 
 def valid_one_epoch(epoch, model, loss_fn, val_loader, device, scheduler=None, schd_loss_update=False):
-
   print(f'[trace] exec@valid_one_epoch')
   model.eval()
   t = time.time()

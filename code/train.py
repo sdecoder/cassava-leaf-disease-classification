@@ -46,7 +46,6 @@ def seed_everything(seed):
   torch.backends.cudnn.deterministic = True
   torch.backends.cudnn.benchmark = True
 
-
 def check_sample_img():
   img = utility.get_img('../data/train_images/1000015157.jpg')
   plt.imshow(img)
