@@ -302,6 +302,11 @@ def train_one_epoch(epoch, model, loss_fn, optimizer, train_loader, device, sche
 
     # print(image_labels.shape, exam_label.shape)
     with autocast():
+
+      from torchsummary import summary
+      print(f'[trace] model: {model}')
+      exit(-1)
+
       image_preds = model(imgs)  # output = model(input)
       # print(image_preds.shape, exam_pred.shape)
 

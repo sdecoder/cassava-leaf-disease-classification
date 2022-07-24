@@ -60,7 +60,7 @@ def main():
   train = pd.read_csv('../data/train.csv')
   print(f'[trace] train.head: {train.head()}')
   print(f'[trace] train.label.value_counts(): {train.label.value_counts()}')
-  check_sample_img()
+  #check_sample_img()
   seed_everything(utility.CFG['seed'])
 
   folds = StratifiedKFold(n_splits=utility.CFG['fold_num'], shuffle=True, random_state=utility.CFG['seed']).split(
