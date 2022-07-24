@@ -1079,7 +1079,7 @@ https://www.techpowerup.com/gpu-specs/tesla-m40-24-gb.c3838
 
 
 
-1. for the INT8 precision:
+1. for the INT8 throughput:
 ```shell
 trtexec --loadEngine=efficientnet_b4_ns.INT8.engine --batch=8192 --streams=8 --verbose --avgRuns=10
 [07/24/2022-22:56:49] [I] === Performance summary ===
@@ -1097,7 +1097,7 @@ trtexec --loadEngine=efficientnet_b4_ns.INT8.engine --batch=8192 --streams=8 --v
 
 
 ```
-2. for the FP16 precision:
+2. for the FP16 throughput:
 
 ```shell
 trtexec --loadEngine=efficientnet_b4_ns.FP16.engine --batch=8192 --streams=8 --verbose --avgRuns=10
@@ -1116,7 +1116,7 @@ trtexec --loadEngine=efficientnet_b4_ns.FP16.engine --batch=8192 --streams=8 --v
 
 ```
 
-3. for the TF32 precision:
+3. for the TF32 throughput:
 
 ```shell
 trtexec --loadEngine=efficientnet_b4_ns.TF32.engine --batch=8192 --streams=8 --verbose --avgRuns=10
@@ -1134,7 +1134,7 @@ trtexec --loadEngine=efficientnet_b4_ns.TF32.engine --batch=8192 --streams=8 --v
 [07/24/2022-23:00:20] [I] Explanations of the performance metrics are printed in the verbose logs.
 ```
 
-4. for the FP32 precision:
+4. for the FP32 throughput:
 
 ```shell
 trtexec --loadEngine=efficientnet_b4_ns.FP32.engine --batch=8192 --streams=8 --verbose --avgRuns=10
@@ -1150,6 +1150,23 @@ trtexec --loadEngine=efficientnet_b4_ns.FP32.engine --batch=8192 --streams=8 --v
 [07/24/2022-23:01:35] [W] * GPU compute time is unstable, with coefficient of variance = 19.1903%.
 [07/24/2022-23:01:35] [W]   If not already in use, locking GPU clock frequency or adding --useSpinWait may improve the stability.
 [07/24/2022-23:01:35] [I] Explanations of the performance metrics are printed in the verbose logs.
+
+```
+
+### Accuracy evaluation
+
+```log
+[trace] validate the tensorrt engine file using ../models/efficientnet_b4_ns.INT8.engine
+[trace] validation multi-class accuracy = 0.9062
+
+[trace] validate the tensorrt engine file using ../models/efficientnet_b4_ns.FP16.engine
+[trace] validation multi-class accuracy = 0.9031
+
+[trace] validate the tensorrt engine file using ../models/efficientnet_b4_ns.TF32.engine
+[trace] validation multi-class accuracy = 0.8844
+
+[trace] validate the tensorrt engine file using ../models/efficientnet_b4_ns.FP32.engine
+[trace] validation multi-class accuracy = 0.8812
 
 ```
 

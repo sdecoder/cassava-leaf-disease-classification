@@ -418,3 +418,19 @@ class MyCrossEntropyLoss(_WeightedLoss):
       loss = loss.mean()
 
     return loss
+
+
+class HostDeviceMem(object):
+  def __init__(self, host_mem, device_mem):
+    self.host = host_mem
+    self.device = device_mem
+
+  def __str__(self):
+    return "Host:\n" + str(self.host) + "\nDevice:\n" + str(self.device)
+
+  def __repr__(self):
+    return self.__str__()
+
+
+def to_numpy(tensor):
+  return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
