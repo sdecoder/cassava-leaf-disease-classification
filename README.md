@@ -95,6 +95,8 @@ In this competition, we introduce a dataset of 21,367 labeled images collected d
 
 Your task is to classify each cassava image into four disease categories or a fifth category indicating a healthy leaf. With your help, farmers may be able to quickly identify diseased plants, potentially saving their crops before they inflict irreparable damage.
 
+Source: https://www.kaggle.com/c/cassava-leaf-disease-classification
+
 ### Prerequisites
 
 All related SDK installed on the development platform.
@@ -106,15 +108,6 @@ All related SDK installed on the development platform.
 * FMix library from https://github.com/ecs-vlc/FMix
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-### Installation
-
-1. Download all prerequisites from the NVIDIA official website;
-2. Install the CUDA SDK;
-3. Install the CuDNN SDK;
-4. Install the TensorRT SDK;
-5. Setup your Anaconda environment;
-6. Install the Pytorch CUDA/ROCm version;
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Workflow
 
@@ -1028,7 +1021,7 @@ torch_out = torch_model(x)
 # Export the model
 torch.onnx.export(torch_model,               # model being run
                   x,                         # model input (or a tuple for multiple inputs)
-                  "super_resolution.onnx",   # where to save the model (can be a file or file-like object)
+                  "target.onnx",   # where to save the model (can be a file or file-like object)
                   export_params=True,        # store the trained parameter weights inside the model file
                   opset_version=10,          # the ONNX version to export the model to
                   do_constant_folding=True,  # whether to execute constant folding for optimization
@@ -1070,6 +1063,11 @@ Once the TensorRT engine is generated, we run the test again to make sure its pr
 In our experiment setup, all INT8/FP16/TF32/FP32 configuration remains at 99% precision.
 Note: If the selected precision is INT8, the calibrator dataset should be provided.
 
+### Engine file size comparison
+* efficientnet_b4_ns.FP16.engine = 70M
+* efficientnet_b4_ns.FP32.engine = 71M
+* efficientnet_b4_ns.INT8.engine = 72M
+* efficientnet_b4_ns.TF32.engine = 71M
 
 ### Performance evaluation
 
@@ -1172,10 +1170,9 @@ trtexec --loadEngine=efficientnet_b4_ns.FP32.engine --batch=8192 --streams=8 --v
 
 ### Conclusion:
 
-1. The file size of TensorRT engines don't vary too much.
-2. The INT8 has achieved best performance.
-3. Because we are using a small network in our template, so we may not expect too much performance boost.
-
+1. The file size of TensorRT engines don't vary too much for different date type.
+2. The FP16 has achieved best performance. The improvement can reach 22.937% (45453.9 qps vs 36973.1 qps)
+3. The FP16 quantization has little impact to the accuracy of the inference result.
 
 <!-- BUILIT WITH
 ### Built With
@@ -1193,18 +1190,13 @@ To get a local copy up and running follow these simple example steps.
 -->
 
 
-
-
 <!-- ROADMAP -->
 ## Roadmap
 
 - [x] Add Changelog
 - [x] Add back to top links
 - [ ] Explorer more possibility
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
+
 
 See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
 
