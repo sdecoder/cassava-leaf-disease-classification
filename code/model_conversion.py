@@ -183,7 +183,7 @@ def generate_trt_engine():
 
   calib = Calibrator(train_loader, cache_file=calibration_cache)
   # engine = build_engine_from_onnxmodel_int8(onnxmodel, calib)
-  mode: utility.CalibratorMode = utility.CalibratorMode.FP16
+  mode: utility.CalibratorMode = utility.CalibratorMode.INT8
   onnx_file_path = '../models/efficientnet_b4_ns-sim.onnx'
 
   if not os.path.exists(onnx_file_path):

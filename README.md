@@ -1154,9 +1154,9 @@ trtexec --loadEngine=efficientnet_b4_ns.FP32.engine --batch=8192 --streams=8 --v
 ### Accuracy evaluation
 
 
-* validate the tensorrt engine file using INT8.engine: multi-class accuracy = 0.9???
-* validate the tensorrt engine file using FP16.engine: multi-class accuracy = 0.9???
-* validate the tensorrt engine file using TF32.engine: multi-class accuracy = 0.9???
+* validate the tensorrt engine file using INT8.engine: multi-class accuracy = 0.8961
+* validate the tensorrt engine file using FP16.engine: multi-class accuracy = 0.9003
+* validate the tensorrt engine file using TF32.engine: multi-class accuracy = 0.8981
 * validate the tensorrt engine file using FP32.engine: multi-class accuracy = 0.9002
 
 ```

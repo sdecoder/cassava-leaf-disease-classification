@@ -166,10 +166,10 @@ def _validate_trt_engine_file(filename):
 def _main():
   print(f"[trace] start@main")
   engine_modes = []
-  #engine_modes.append(utility.CalibratorMode.INT8)
-  #engine_modes.append(utility.CalibratorMode.FP16)
-  #engine_modes.append(utility.CalibratorMode.TF32)
-  engine_modes.append(utility.CalibratorMode.FP32)
+  engine_modes.append(utility.CalibratorMode.INT8)
+  engine_modes.append(utility.CalibratorMode.FP16)
+  engine_modes.append(utility.CalibratorMode.TF32)
+  #engine_modes.append(utility.CalibratorMode.FP32)
 
   for _mode in engine_modes:
     realname = f'../models/efficientnet_b4_ns.{_mode.name}.engine'
