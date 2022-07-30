@@ -85,7 +85,7 @@ CFG = {
   'model_arch': 'tf_efficientnet_b4_ns',
   'img_size': 512,
   'epochs': 20,
-  'train_bs': 16,
+  'train_bs': 128,
   'valid_bs': 32,
   'T_0': 10,
   'lr': 1e-4,
@@ -313,7 +313,9 @@ def prepare_dataloader(df, trn_idx, val_idx, data_root='../input/cassava-leaf-di
   return train_loader, val_loader
 
 
+from apex import amp
 def train_one_epoch(epoch, model, loss_fn, optimizer, train_loader, device, scheduler=None, schd_batch_update=False):
+
   print(f'[trace] exec@train_one_epoch')
   model.train()
   t = time.time()
@@ -333,7 +335,10 @@ def train_one_epoch(epoch, model, loss_fn, optimizer, train_loader, device, sche
       # print(image_preds.shape, exam_pred.shape)
 
       loss = loss_fn(image_preds, image_labels)
-      scaler.scale(loss).backward()
+
+      with amp.scale_loss(loss, optimizer) as scaled_loss:
+        #scaled_loss.backward()
+        scaler.scale(scaled_loss).backward()
 
       if running_loss is None:
         running_loss = loss.item()
@@ -355,11 +360,14 @@ def train_one_epoch(epoch, model, loss_fn, optimizer, train_loader, device, sche
 
         pbar.set_description(description)
 
+  delta = time.time() - t
+  print(f'[trace] epoch {epoch} takes {delta} seconds')
   if scheduler is not None and not schd_batch_update:
     scheduler.step()
 
 
 def valid_one_epoch(epoch, model, loss_fn, val_loader, device, scheduler=None, schd_loss_update=False):
+
   print(f'[trace] exec@valid_one_epoch')
   model.eval()
   t = time.time()
@@ -377,9 +385,7 @@ def valid_one_epoch(epoch, model, loss_fn, val_loader, device, scheduler=None, s
     # print(image_preds.shape, exam_pred.shape)
     image_preds_all += [torch.argmax(image_preds, 1).detach().cpu().numpy()]
     image_targets_all += [image_labels.detach().cpu().numpy()]
-
     loss = loss_fn(image_preds, image_labels)
-
     loss_sum += loss.item() * image_labels.shape[0]
     sample_num += image_labels.shape[0]
 

@@ -77,7 +77,6 @@ def main():
     train_loader, val_loader = utility.prepare_dataloader(train, trn_idx, val_idx, data_root=data_root)
 
     device = torch.device(utility.CFG['device'])
-
     model = utility.CassvaImgClassifier(utility.CFG['model_arch'], train.label.nunique(), pretrained=True).to(device)
     scaler = GradScaler()
     optimizer = torch.optim.Adam(model.parameters(), lr=utility.CFG['lr'], weight_decay=utility.CFG['weight_decay'])
@@ -89,6 +88,10 @@ def main():
 
     loss_tr = nn.CrossEntropyLoss().to(device)  # MyCrossEntropyLoss().to(device)
     loss_fn = nn.CrossEntropyLoss().to(device)
+
+    opt_level = 'O0'
+    from apex import amp
+    model, optimizer = amp.initialize(model, optimizer, opt_level=opt_level)
 
     for epoch in range(utility.CFG['epochs']):
       utility.train_one_epoch(epoch, model, loss_tr, optimizer, train_loader, device, scheduler=scheduler,

@@ -81,11 +81,14 @@ def GiB(val):
 
 
 def build_engine_common_routine(network, builder, config, runtime, engine_file_path):
+  '''
   input_batch_size = 16
   input_channel = 3
   input_image_width = 512
   input_image_height = input_image_width
   network.get_input(0).shape = [input_batch_size, input_channel, input_image_width, input_image_height]
+  '''
+
   plan = builder.build_serialized_network(network, config)
   if plan == None:
     print("[trace] builder.build_serialized_network failed, exit -1")
@@ -207,8 +210,8 @@ def generate_trt_engine():
         return None
       print("[trace] completed parsing of ONNX file")
 
-    builder.max_batch_size = batch_size
-    config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, GiB(4))
+    #builder.max_batch_size = batch_size
+    config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, GiB(16))
 
     if mode == utility.CalibratorMode.INT8:
       config.set_flag(trt.BuilderFlag.INT8)
@@ -226,6 +229,14 @@ def generate_trt_engine():
 
     config.int8_calibrator = calib
     engine_file_path = f'../models/efficientnet_b4_ns.{mode.name}.engine'
+    profile = builder.create_optimization_profile()
+    min_shape = (1, 3, 512, 512)
+    opt_shape = (64, 3, 512, 512)
+    max_shape = (128, 3, 512, 512)
+    profile.set_shape(network.get_input(0).name, min_shape, opt_shape, max_shape)
+    config.add_optimization_profile(profile)
+    print(f'[trace] utility.build_engine_common_routine')
+
     return build_engine_common_routine(network, builder, config, runtime, engine_file_path)
   pass
 
